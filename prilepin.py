@@ -38,7 +38,8 @@ class Lift:
 class Session:
     _typespec = [('pct', float), ('wgt', float),
                 ('sets', int), ('reps', int),
-                ('inol', float), ('inol/set', float)]
+                ('inol', float), ('vol', float),
+                ('inol/set', float), ('vol/set', float)]
     WRM = np.array([(.3, 1, 5),
                         (.5, 1, 5),
                         (.7, 1, 3),
@@ -66,18 +67,21 @@ class Session:
         else: # if it's not sets, then it's inols
                 inols = np.round(tbl['inols'], 2)
                 sets = np.round(lift.reps(wgts, inols)/reps)
+                inols = lift.inol(wgts, sets*reps) # adjust inols for computed sets
+        vols = np.round(wgts*sets*reps)
         set_inols = np.round(inols/sets, 2)
-        return pcts, wgts, sets, reps, inols, set_inols
+        set_vols = np.round(vols/sets)
+        return pcts, wgts, sets, reps, inols, vols, set_inols, set_vols
 
     def week(self, week_num):            
         work_sets = self.WEEK[self.WEEK['WN']==week_num][['pct', 'sets', 'reps']]
         warmup_sets = self.WRM[self.WRM['pct']<work_sets['pct']]
 
         pri = self._prim_lift
-        warm_pct, warm_wgt, wsets, wreps, winol, wsinol = self._comp_stats(pri, warmup_sets)
-        train_pct, train_wgt, tsets, treps, tinol, tsinol = self._comp_stats(pri, work_sets)
-        pri_tbl = np.array(list(zip(warm_pct, warm_wgt, wsets, wreps, winol, wsinol))
-                         + [(train_pct, train_wgt, tsets, treps, tinol, tsinol)],
+        warm_pct, warm_wgt, wsets, wreps, winol, wvol, wsinol, wsvol = self._comp_stats(pri, warmup_sets)
+        train_pct, train_wgt, tsets, treps, tinol, tvol, tsinol, tsvol = self._comp_stats(pri, work_sets)
+        pri_tbl = np.array(list(zip(warm_pct, warm_wgt, wsets, wreps, winol, wvol, wsinol, wsvol))
+                         + [(train_pct, train_wgt, tsets, treps, tinol, tvol, tsinol, tsvol)],
                            dtype = self._typespec)
         pri_inol = winol.sum() + tinol.sum()
         pri_vol = np.sum(pri_tbl['sets']*pri_tbl['reps']*pri_tbl['wgt'])
@@ -87,14 +91,16 @@ class Session:
         sec_tbl = np.array([(.50, 5, .25*sec_inol),
                             (.75, 5, .75*sec_inol)],
                             dtype=[('pct', float), ('reps', int), ('inols', float)])
-        sec_pct, sec_wgt, ssets, sreps, sinol, ssinol = self._comp_stats(sec, sec_tbl)
-        sec_tbl = np.array(list(zip(sec_pct, sec_wgt, ssets, sreps, sinol, ssinol)), dtype=self._typespec)
+        sec_pct, sec_wgt, ssets, sreps, sinol, svol, ssinol, ssvol = self._comp_stats(sec, sec_tbl)
+        sec_inol = sinol.sum() # recompute after rep readjustment
+        sec_tbl = np.array(list(zip(sec_pct, sec_wgt, ssets, sreps, sinol, svol, ssinol, ssvol)), dtype=self._typespec)
         sec_vol = np.sum(sec_tbl['sets']*sec_tbl['reps']*sec_tbl['wgt'])
 
         print('PRIMARY ({}); TOT INOL: {:4.2f}; TOT VOL: {:4.0f} [kgs]'.format(pri.name, pri_inol, pri_vol))
         print(pds.DataFrame(pri_tbl, index=[week_num]*len(pri_tbl)))
-        print('SECONDARY ({}); tot inol: {:4.2f}; TOT VOL: {:4.0f} [kgs]'.format(sec.name, sec_inol, sec_vol))
+        print('SECONDARY ({}); TOT INOL: {:4.2f}; TOT VOL: {:4.0f} [kgs]'.format(sec.name, sec_inol, sec_vol))
         print(pds.DataFrame(sec_tbl, index=[week_num]*len(sec_tbl)))
+        print('TOT INOL: {:4.2f}; TOT VOL: {:4.0f}'.format(pri_inol+sec_inol, pri_vol+sec_vol))
         return dict(pri=pri_tbl, sec=sec_tbl)
         
 class MaxEffDay(Session):
@@ -133,18 +139,10 @@ if __name__ == '__main__':
     SQMAX = MaxEffDay(BSQ, FSQ)
     SQDYN = DynEffDay(BSQ, SDL)
 
-    print('        DEADLIFT')
-    print('MAX EFFORT')
+    print('        WEDNSDAY (Max Effort DL)')
     _ = DLMAX.week(week_num)
-    print('DYNAMIC EFFORT')
-    _ = DLDYN.week(week_num)
-    print('\n        SQUAT')
-    print('MAX EFFORT')
-    _ = SQMAX.week(week_num)
-    print('DYNAMIC EFFORT')
-    _ = SQDYN.week(week_num)
-    print('\n        BENCH PRESS')
-    print('MAX EFFORT')
+    print('\n        FRIDAY (Max Effort BP)')
     _ = BPMAX.week(week_num)
-    print('DYNAMIC EFFORT')
+    print('\n        SUNDAY (Dynamic Effort DL + BP)')
+    _ = DLDYN.week(week_num)
     _ = BPDYN.week(week_num)
