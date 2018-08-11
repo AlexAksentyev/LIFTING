@@ -67,6 +67,7 @@ class Session:
         else: # if it's not sets, then it's inols
                 inols = np.round(tbl['inols'], 2)
                 sets = np.round(lift.reps(wgts, inols)/reps)
+                sets = np.array([1 if e==0 else e for e in sets])
                 inols = lift.inol(wgts, sets*reps) # adjust inols for computed sets
         vols = np.round(wgts*sets*reps)
         set_inols = np.round(inols/sets, 2)
@@ -104,13 +105,13 @@ class Session:
         return dict(pri=pri_tbl, sec=sec_tbl)
         
 class MaxEffDay(Session):
-    WEEK = np.array([(1, .8, 4, 4),
-                         (2, .85, 3, 4),
-                         (3, .9, 3, 2),
-                         (5, .85, 4, 3),
-                         (6, .9, 3, 2),
-                         (7, .95, 3, 1)],
-                            dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
+    WEEK = np.array([(1, .80, 4, 4),
+                     (2, .85, 5, 3),
+                     (3, .90, 4, 2),
+                     (5, .85, 5, 3),
+                     (6, .90, 4, 2),
+                     (7, .95, 3, 2)],
+                        dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
 
 class DynEffDay(Session):
         WEEK = np.array([(1, .50, 5, 5),
