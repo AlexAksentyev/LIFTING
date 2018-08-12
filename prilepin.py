@@ -108,21 +108,21 @@ class Session:
         return dict(pri=pri_tbl, sec=sec_tbl)
         
 class MaxEffDay(Session):
-    WEEK = np.array([(1, .80, 4, 4),
+    WEEK = np.array([(1, .80, 6, 3),
                      (2, .85, 5, 3),
-                     (3, .90, 4, 2),
+                     (3, .90, 5, 2),
                      (5, .85, 5, 3),
-                     (6, .90, 4, 2),
+                     (6, .90, 5, 2),
                      (7, .95, 3, 2)],
                         dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
 
 class DynEffDay(Session):
-        WEEK = np.array([(1, .50, 5, 5),
-                         (2, .55, 5, 5),
-                         (3, .60, 5, 5),
-                         (5, .65, 5, 5),
-                         (6, .70, 3, 6),
-                         (7, .75, 3, 6)],
+        WEEK = np.array([(1, .55, 5, 5),
+                         (2, .60, 5, 5),
+                         (3, .65, 5, 5),
+                         (5, .55, 6, 4),
+                         (6, .60, 5, 4),
+                         (7, .65, 6, 3)],
                             dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
 
 class Micro:
