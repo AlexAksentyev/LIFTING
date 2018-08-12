@@ -132,20 +132,20 @@ class Micro:
 
     def volume(self, week_num):
         typ = list(zip(['pri','sec','net'], [int]*3))
-        max_eff_vol = np.empty(len((self.max_eff_days), 2), dtype=typ)
-        dyn_eff_vol = np.empty(len((self.dyn_eff_days), 2), dtype=typ)
+        max_eff_vol = np.empty(len(self.max_eff_days), dtype=typ)
+        dyn_eff_vol = np.empty(len(self.dyn_eff_days), dtype=typ)
         for i, day in enumerate(self.max_eff_days):
             dm = day.week(week_num, silent=True)
             pv = dm['pri']['vol'].sum()
             sv = dm['sec']['vol'].sum()
             max_eff_vol[i] = pv, sv, pv+sv
         for i, day in enumerate(self.dyn_eff_days):
-            dd = self.dyn_eff_day.week(week_num, silent=True)
+            dd = day.week(week_num, silent=True)
             pv = dd['pri']['vol'].sum()
             sv = dd['sec']['vol'].sum()
             dyn_eff_vol[i] = pv, sv, pv+sv
-        pri_vol = max_eff_vol['pri'] + dyn_eff_vol['sum']
-        sec_vol = dm['sec']['vol'].sum() + dd['sec']['vol'].sum()
+        pri_vol = max_eff_vol['pri'] + dyn_eff_vol['pri']
+        sec_vol = max_eff_vol['sec'] + dyn_eff_vol['sec']
         net_vol = pri_vol + sec_vol
         return pri_vol, sec_vol, net_vol
         
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     SQMAX = MaxEffDay('SUNDAY (Max Effort SQ)', BSQ, FSQ)
     SQDYN = DynEffDay('WEDNSDAY (Dynamic Effort SQ)', BSQ, SDL)
 
-    cycle = Micro([DLMAX], [DLDYN])
+    cycle = Micro([DLMAX, BPMAX], [DLDYN, BPDYN])
 
     silent = dict(WED=True, FRI=True, SUN=True)
     if day!='ALL':
@@ -179,10 +179,7 @@ if __name__ == '__main__':
         for day in silent.keys():
             silent[day]=False
             
-    # print('        WEDNSDAY (Max Effort DL)') 
     dlmax_tbl = DLMAX.week(week_num, silent['WED'])
-    # print('\n        FRIDAY (Max Effort BP)') 
     bpmax_tbl = BPMAX.week(week_num, silent['FRI'])
-    # print('\n        SUNDAY (Dynamic Effort DL + BP)')
     dldyn_tbl = DLDYN.week(week_num, silent['SUN'])
     bpdyn_tbl = BPDYN.week(week_num, silent['SUN'])
