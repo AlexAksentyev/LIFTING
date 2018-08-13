@@ -121,6 +121,7 @@ class Session:
             sec_tbl['inol/set'] *= 0
             sec_tbl['vol/set']  *= 0
         sec_vol = np.sum(sec_tbl['sets']*sec_tbl['reps']*sec_tbl['wgt'])
+        sec_inol = self._sec_lift.inol(sec_tbl['wgt'], sec_tbl['sets']*sec_tbl['reps']).sum()
 
         if not silent:
             print('        '+self._week_day)
