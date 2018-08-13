@@ -7,13 +7,18 @@ import sys
 class Micro:
     def __init__(self, **name_daytuple):
         self._days = name_daytuple
+        # prepare for the computation of stats
         for name, day in self._days.items():
             if not isinstance(day, tuple):
                 self._days[name] = (day,)
 
-    def vol(self, week_num):
+        # compute stats
+        self.volume = self._vol(number)
+        self.inol = self._inol(number)
+
+    def _vol(self, week_num):
         return self._compute_stat('vol', week_num)
-    def inol(self, week_num):
+    def _inol(self, week_num):
         return self._compute_stat('inol', week_num)
 
     def _compute_stat(self, stat_name, week_num):
@@ -29,27 +34,39 @@ class Micro:
             stat_net = stat_pri + stat_sec
             stats[idx] = name+str(week_num), stat_pri, stat_sec, stat_net
             idx += 1
-        return stats    
+        return stats
+
+# class Meso:
+#     def __init__(self, *micro_lst):
+#         self._micros = micro_lst
+
+#     def _compute_stat(self, stat_name):
+#         stats = np.empty(len(self._micros),
+#                          dtype=list(zip(['num', 'pri','sec','net'], [int]+[float]*3)))
+#         for cycle in self._micros:
+#             s = 
     
 if __name__ == '__main__':
     plt.ion()
-    cycle = Micro(WED=PLP.DLMAX, FRI=PLP.BPMAX, SUN=(PLP.DLDYN, PLP.BPDYN))
-    
-    vol_lst = []; inol_lst = []
+    cyc_lst = []
     for wn in [1,2,3,5,6,7]:
-        vol_lst.append(cycle.vol(wn))
-        inol_lst.append(cycle.inol(wn))
-    vols = np.concatenate(vol_lst)
-    inols = np.concatenate(inol_lst)
+        cyc_lst.append(Micro(wn, WED=PLP.DLMAX, FRI=PLP.BPMAX, SUN=(PLP.DLDYN, PLP.BPDYN)))
+    
+    # vol_lst = []; inol_lst = []
+    # for wn in [1,2,3,5,6,7]:
+    #     vol_lst.append(cycle.vol(wn))
+    #     inol_lst.append(cycle.inol(wn))
+    # vols = np.concatenate(vol_lst)
+    # inols = np.concatenate(inol_lst)
 
-    f, ax = plt.subplots(2,1,sharex=True)
-    ax[0].plot(vols['day'], vols['pri'], '--.r', label='primary')
-    ax[0].plot(vols['day'], vols['sec'], '--.b', label='secondary')
-    ax[0].plot(vols['day'], vols['net'], '--.m', label='net')
-    ax[0].set_title('volume'); ax[0].set_ylabel('volume [kgs]'); ax[0].legend()
-    ax[1].plot(inols['day'], inols['pri'], '--.r', label='primary')
-    ax[1].plot(inols['day'], inols['sec'], '--.b', label='secondary')
-    ax[1].plot(inols['day'], inols['net'], '--.m', label='net')
-    ax[1].set_title('inol'); ax[1].set_ylabel('INOL'); ax[1].legend()
-    ax[0].axhline(linestyle='--', color='gray'); ax[1].axhline(linestyle='--', color='gray')
+    # f, ax = plt.subplots(2,1,sharex=True)
+    # ax[0].plot(vols['day'], vols['pri'], '--.r', label='primary')
+    # ax[0].plot(vols['day'], vols['sec'], '--.b', label='secondary')
+    # ax[0].plot(vols['day'], vols['net'], '--.m', label='net')
+    # ax[0].set_title('volume'); ax[0].set_ylabel('volume [kgs]'); ax[0].legend()
+    # ax[1].plot(inols['day'], inols['pri'], '--.r', label='primary')
+    # ax[1].plot(inols['day'], inols['sec'], '--.b', label='secondary')
+    # ax[1].plot(inols['day'], inols['net'], '--.m', label='net')
+    # ax[1].set_title('inol'); ax[1].set_ylabel('INOL'); ax[1].legend()
+    # ax[0].axhline(linestyle='--', color='gray'); ax[1].axhline(linestyle='--', color='gray')
     
