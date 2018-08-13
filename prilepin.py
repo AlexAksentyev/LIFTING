@@ -123,54 +123,27 @@ class DynEffDay(Session):
                          (5, .55, 6, 4),
                          (6, .60, 5, 4),
                          (7, .65, 6, 3)],
-                            dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
+                            dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])        
 
-class Micro:
-    def __init__(self, max_eff_days, dyn_eff_days):
-        self.max_eff_days = max_eff_days
-        self.dyn_eff_days = dyn_eff_days
+############################################################
+BSQ = Lift('BACK SQ', 140, 20, 60)
+FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
+SDL = Lift('SUMO DL', 137.5, 20, 60)
+CDL = Lift('CONV DL', 104, 20, 60)
+FBP = Lift('FLAT BP', 115, 12.5, 32.5)
+IBP = Lift('INCLINE BP', 52.5, 12.5, 32.5)
+OHP = Lift('OHP', 70, 12.5, 32.5)
 
-    def volume(self, week_num):
-        typ = list(zip(['pri','sec','net'], [int]*3))
-        max_eff_vol = np.empty(len(self.max_eff_days), dtype=typ)
-        dyn_eff_vol = np.empty(len(self.dyn_eff_days), dtype=typ)
-        for i, day in enumerate(self.max_eff_days):
-            dm = day.week(week_num, silent=True)
-            pv = dm['pri']['vol'].sum()
-            sv = dm['sec']['vol'].sum()
-            max_eff_vol[i] = pv, sv, pv+sv
-        for i, day in enumerate(self.dyn_eff_days):
-            dd = day.week(week_num, silent=True)
-            pv = dd['pri']['vol'].sum()
-            sv = dd['sec']['vol'].sum()
-            dyn_eff_vol[i] = pv, sv, pv+sv
-        pri_vol = max_eff_vol['pri'] + dyn_eff_vol['pri']
-        sec_vol = max_eff_vol['sec'] + dyn_eff_vol['sec']
-        net_vol = pri_vol + sec_vol
-        return pri_vol, sec_vol, net_vol
-        
-        
-        
-        
+DLMAX = MaxEffDay('WEDNSDAY (Max Effort DL)', SDL, CDL)
+DLDYN = DynEffDay('SUNDAY (Dynamic Effort DL)', SDL, BSQ)
+BPMAX = MaxEffDay('FRIDAY (Max Effort BP)', FBP, IBP)
+BPDYN = DynEffDay('SUNDAY (Dynamic Effort BP)', FBP, OHP)
+SQMAX = MaxEffDay('SUNDAY (Max Effort SQ)', BSQ, FSQ)
+SQDYN = DynEffDay('WEDNSDAY (Dynamic Effort SQ)', BSQ, SDL)
+    
 if __name__ == '__main__':
     week_num = int(sys.argv[1])
     day = sys.argv[2].upper() if len(sys.argv)>2 else 'ALL'
-    BSQ = Lift('BACK SQ', 140, 20, 60)
-    FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
-    SDL = Lift('SUMO DL', 137.5, 20, 60)
-    CDL = Lift('CONV DL', 104, 20, 60)
-    FBP = Lift('FLAT BP', 115, 12.5, 32.5)
-    IBP = Lift('INCLINE BP', 52.5, 12.5, 32.5)
-    OHP = Lift('OHP', 70, 12.5, 32.5)
-
-    DLMAX = MaxEffDay('WEDNSDAY (Max Effort DL)', SDL, CDL)
-    DLDYN = DynEffDay('SUNDAY (Dynamic Effort DL)', SDL, BSQ)
-    BPMAX = MaxEffDay('FRIDAY (Max Effort BP)', FBP, IBP)
-    BPDYN = DynEffDay('SUNDAY (Dynamic Effort BP)', FBP, OHP)
-    SQMAX = MaxEffDay('SUNDAY (Max Effort SQ)', BSQ, FSQ)
-    SQDYN = DynEffDay('WEDNSDAY (Dynamic Effort SQ)', BSQ, SDL)
-
-    cycle = Micro([DLMAX, BPMAX], [DLDYN, BPDYN])
 
     silent = dict(WED=True, FRI=True, SUN=True)
     if day!='ALL':
