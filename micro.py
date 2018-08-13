@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import sys
 
 class Micro:
-    def __init__(self, **name_daytuple):
+    def __init__(self, number, **name_daytuple):
         self._days = name_daytuple
         # prepare for the computation of stats
         for name, day in self._days.items():
@@ -13,26 +13,27 @@ class Micro:
                 self._days[name] = (day,)
 
         # compute stats
-        self.volume = self._vol(number)
-        self.inol = self._inol(number)
+        self.stats = self._compute_stats(number)
 
-    def _vol(self, week_num):
-        return self._compute_stat('vol', week_num)
-    def _inol(self, week_num):
-        return self._compute_stat('inol', week_num)
-
-    def _compute_stat(self, stat_name, week_num):
-        stats = np.empty(len(self._days.keys()),
-                         dtype = list(zip(['day', 'pri', 'sec', 'net'], [object]+[float]*3)) )
+    def _compute_stats(self, week_num):
+        stats = np.empty((len(self._days.keys()), 3),
+                         dtype = list(zip(['day', 'inol', 'vol'], [object, float, float])) )
+        stat = lambda lift, name: tbl[lift][name].sum()
         idx = 0
         for name, day in self._days.items():
-            stat_pri = 0; stat_sec = 0
+            pri_vol = 0; pri_inol = 0
+            sec_vol = 0; sec_inol = 0
             for movement in day:
                 tbl = movement.week(week_num, silent=True)
-                stat_pri += tbl['pri'][stat_name].sum()
-                stat_sec += tbl['sec'][stat_name].sum()
-            stat_net = stat_pri + stat_sec
-            stats[idx] = name+str(week_num), stat_pri, stat_sec, stat_net
+                pri_vol += stat('pri', 'vol')
+                pri_inol += stat('pri', 'inol')
+                sec_vol += stat('sec', 'vol')
+                sec_inol += stat('sec','inol')
+            net_vol = pri_vol + sec_vol
+            net_inol = pri_inol + sec_inol
+            stats[idx][0] = name+str(week_num), net_inol, net_vol
+            stats[idx][1] = name+str(week_num), pri_inol, pri_vol
+            stats[idx][2] = name+str(week_num), sec_inol, sec_vol
             idx += 1
         return stats
 
