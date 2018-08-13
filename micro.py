@@ -3,9 +3,32 @@ import numpy as np
 from pandas import DataFrame
 import matplotlib.pyplot as plt
 import sys
+from importlib import reload
 
-class Micro:
+reload(PLP)
+
+class Cycle:
+    def __init__(self):
+        self.stats = None
+
+    def plot(self, stat, stats=None):
+        if stats is None: stats = self.stats
+        xlab = stats.dtype.names[0]
+        pname = 'primary'
+        sname = 'secondary'
+        plt.figure()
+        plt.plot(stats[:,1][xlab], stats[:,1][stat], '--.', label=pname)
+        plt.plot(stats[:,2][xlab], stats[:,2][stat], '--.', label=sname)
+        plt.plot(stats[:,0][xlab], stats[:,0][stat], '--*', label='tot', lw=2.5)
+        plt.legend()
+        plt.axhline(ls='--', color='gray')
+        plt.title(stat)
+        
+
+
+class Micro(Cycle):
     def __init__(self, number, **name_daytuple):
+        super().__init__()
         self._days = name_daytuple
         # prepare for the computation of stats
         for name, day in self._days.items():
@@ -13,11 +36,22 @@ class Micro:
                 self._days[name] = (day,)
 
         # compute stats
-        self.stats = self._compute_stats(number)
+        self.stats = self._compute_stats(number)     
 
+    def day(self, name):
+        d = self._days[name.upper()]
+        return d[0] if len(d)==1 else d
+
+    def plot(self, stat='inol'):
+        super().plot(stat)
+        plt.axhline(y=.75, ls='--', lw=.5, color='blue')
+        plt.axhline(y=1.0, ls='--', lw=.5, color='blue')
+        plt.axhline(y=1.5, ls='--', lw=.5, color='red')
+        plt.axhline(y=2.0, ls='--', lw=.5, color='red')
+    
     def _compute_stats(self, week_num):
         stats = np.empty((len(self._days.keys()), 3),
-                         dtype = list(zip(['day', 'inol', 'vol'], [object, float, float])) )
+                         dtype = list(zip([ 'cycle', 'inol', 'vol'], [object, float, float])) )
         stat = lambda lift, name: tbl[lift][name].sum()
         idx = 0
         for name, day in self._days.items():
@@ -25,10 +59,10 @@ class Micro:
             sec_vol = 0; sec_inol = 0
             for movement in day:
                 tbl = movement.week(week_num, silent=True)
-                pri_vol += stat('pri', 'vol')
+                pri_vol  += stat('pri', 'vol')
                 pri_inol += stat('pri', 'inol')
-                sec_vol += stat('sec', 'vol')
-                sec_inol += stat('sec','inol')
+                sec_vol  += stat('sec', 'vol')
+                sec_inol += stat('sec', 'inol')
             net_vol = pri_vol + sec_vol
             net_inol = pri_inol + sec_inol
             stats[idx][0] = name+str(week_num), net_inol, net_vol
@@ -37,37 +71,45 @@ class Micro:
             idx += 1
         return stats
 
-# class Meso:
-#     def __init__(self, *micro_lst):
-#         self._micros = micro_lst
+class Meso(Cycle):
+    def __init__(self, micro_lst):
+        super().__init__()
+        self._micros = micro_lst
+        self.stats = np.concatenate([cyc.stats for cyc in self._micros])
 
-#     def _compute_stat(self, stat_name):
-#         stats = np.empty(len(self._micros),
-#                          dtype=list(zip(['num', 'pri','sec','net'], [int]+[float]*3)))
-#         for cycle in self._micros:
-#             s = 
+        self._micro_stats = np.empty((len(self._micros), 3),
+                                     dtype=[('cycle', object), ('inol', float), ('vol', float)])
+        for idx, cyc in enumerate(self._micros):
+            tbl0 = cyc.stats
+            for i in range(3):
+                tbl = DataFrame(tbl0[:,i]).sum(axis=0)
+                self._micro_stats[idx, i] = tbl['cycle'], tbl['inol'], tbl['vol']
+
+    def plot(self, stat='inol'):
+        super().plot(stat)
+        plt.axhline(y=.75, ls='--', lw=.5, color='blue')
+        plt.axhline(y=1.0, ls='--', lw=.5, color='blue')
+        plt.axhline(y=1.5, ls='--', lw=.5, color='red')
+        plt.axhline(y=2.0, ls='--', lw=.5, color='red')
+
+    def plot_micros(self, stat='inol'):
+        super().plot(stat, self._micro_stats)
+        plt.axhline(y=1.00, ls='--', lw=.5, color='blue')
+        plt.axhline(y=1.98, ls='--', lw=.5, color='blue')
+        plt.axhline(y=2.02, ls='--', lw=.5, color='red')
+        plt.axhline(y=3.00, ls='--', lw=.5, color='red')
+        
+        
+    def __getitem__(self, idx):
+        return self._micros[idx]
+            
     
 if __name__ == '__main__':
     plt.ion()
-    cyc_lst = []
+    dl_micros = []; bp_micros = []
     for wn in [1,2,3,5,6,7]:
-        cyc_lst.append(Micro(wn, WED=PLP.DLMAX, FRI=PLP.BPMAX, SUN=(PLP.DLDYN, PLP.BPDYN)))
-    
-    # vol_lst = []; inol_lst = []
-    # for wn in [1,2,3,5,6,7]:
-    #     vol_lst.append(cycle.vol(wn))
-    #     inol_lst.append(cycle.inol(wn))
-    # vols = np.concatenate(vol_lst)
-    # inols = np.concatenate(inol_lst)
+        dl_micros.append(Micro(wn, WED=PLP.DLMAX, SUN=PLP.DLDYN))
+        bp_micros.append(Micro(wn, FRI=PLP.BPMAX, SUN=PLP.BPDYN))
 
-    # f, ax = plt.subplots(2,1,sharex=True)
-    # ax[0].plot(vols['day'], vols['pri'], '--.r', label='primary')
-    # ax[0].plot(vols['day'], vols['sec'], '--.b', label='secondary')
-    # ax[0].plot(vols['day'], vols['net'], '--.m', label='net')
-    # ax[0].set_title('volume'); ax[0].set_ylabel('volume [kgs]'); ax[0].legend()
-    # ax[1].plot(inols['day'], inols['pri'], '--.r', label='primary')
-    # ax[1].plot(inols['day'], inols['sec'], '--.b', label='secondary')
-    # ax[1].plot(inols['day'], inols['net'], '--.m', label='net')
-    # ax[1].set_title('inol'); ax[1].set_ylabel('INOL'); ax[1].legend()
-    # ax[0].axhline(linestyle='--', color='gray'); ax[1].axhline(linestyle='--', color='gray')
-    
+    DLMESO = Meso(dl_micros)
+    BPMESO = Meso(bp_micros)
