@@ -2,6 +2,16 @@ import numpy as np
 import pandas as pds
 import sys
 
+PRILEPIN = np.array([(0.0, .70, 18, 30, 24),
+                     (.70, .80, 12, 24, 18),
+                     (.80, .90, 10, 20, 15),
+                     (.90, 1.0,  4, 10,  7)],
+                    dtype=list(zip(['lowP', 'upP', 'lowR', 'upR', 'optR'], [float]*2 + [int]*3)))
+    
+def useful(reps, pct):
+    row = PRILEPIN[np.logical_and(pct>=PRILEPIN['lowP'], pct<PRILEPIN['upP'])]
+    return reps >= row['lowR'] and reps <= row['upR']
+
 class Lift:
     _bar_wgt = 20
     
@@ -57,6 +67,13 @@ class Session:
         self._sec_lift = sec_lift
         self._targ_inol = targ_inol
 
+    @property
+    def pri_lift(self):
+        return self._prim_lift
+    @property
+    def sec_lift(self):
+        return self._sec_lift
+
     def _comp_stats(self, lift, tbl):
         wgts = np.array([lift.pick_closest(wgt)
                                  for wgt in tbl['pct']*lift.RM1])
@@ -68,11 +85,11 @@ class Session:
         else: # if it's not sets, then it's inols
                 inols = np.round(tbl['inols'], 2)
                 sets = np.round(lift.reps(wgts, inols)/reps)
-                sets = np.array([1 if e==0 else e for e in sets])
+                sets = np.array([0 if e<0 else e for e in sets])
                 inols = lift.inol(wgts, sets*reps) # adjust inols for computed sets
         vols = np.round(wgts*sets*reps)
-        set_inols = np.round(inols/sets, 2)
-        set_vols = np.round(vols/sets)
+        set_inols = np.round(np.divide(inols, sets, where=sets!=0), 2)
+        set_vols = np.round(np.divide(vols, sets, where=sets!=0))
         return pcts, wgts, sets, reps, inols, vols, set_inols, set_vols
 
     def week(self, week_num, silent=False):            
@@ -96,6 +113,13 @@ class Session:
         sec_pct, sec_wgt, ssets, sreps, sinol, svol, ssinol, ssvol = self._comp_stats(sec, sec_tbl)
         sec_inol = sinol.sum() # recompute after rep readjustment
         sec_tbl = np.array(list(zip(sec_pct, sec_wgt, ssets, sreps, sinol, svol, ssinol, ssvol)), dtype=self._typespec)
+        if not useful(ssets[1]*sreps[1], sec_pct[1]): # if the work sets aren't useful, don't include sec lift
+            sec_tbl['sets'] *= 0
+            sec_tbl['reps'] *= 0
+            sec_tbl['inol'] *= 0
+            sec_tbl['vol']  *= 0
+            sec_tbl['inol/set'] *= 0
+            sec_tbl['vol/set']  *= 0
         sec_vol = np.sum(sec_tbl['sets']*sec_tbl['reps']*sec_tbl['wgt'])
 
         if not silent:
@@ -108,11 +132,11 @@ class Session:
         return dict(pri=pri_tbl, sec=sec_tbl)
         
 class MaxEffDay(Session):
-    WEEK = np.array([(1, .80, 6, 3),
-                     (2, .85, 5, 3),
-                     (3, .90, 5, 2),
+    WEEK = np.array([(1, .82, 5, 3),
+                     (2, .87, 5, 3),
+                     (3, .93, 3, 2),
                      (5, .85, 5, 3),
-                     (6, .90, 5, 2),
+                     (6, .93, 3, 2),
                      (7, .95, 3, 2)],
                         dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
 
