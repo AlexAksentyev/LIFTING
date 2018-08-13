@@ -18,12 +18,12 @@ class Cycle:
         pname = 'primary'
         sname = 'secondary'
         plt.figure()
-        rng = [np.arange(0, int(stats.shape[0]/2), 2),
-               np.arange(1, int(stats.shape[0]/2), 2)]
-        
-        plt.plot(stats[:,1][xlab], stats[:,1][stat], '--.', label=pname)
-        plt.plot(stats[:,2][xlab], stats[:,2][stat], '--.', label=sname)
-        plt.plot(stats[:,0][xlab], stats[:,0][stat], '--*', label='tot', lw=2.5)
+        plt.plot(stats[:,1][stat], '--.', label=pname)
+        plt.xticks(range(stats.shape[0]), stats[:,1][xlab])
+        plt.plot(stats[:,2][stat], '--.', label=sname)
+        plt.xticks(range(stats.shape[0]), stats[:,2][xlab])
+        plt.plot(stats[:,0][stat], '--*', label='tot', lw=2.5)
+        plt.xticks(range(stats.shape[0]), stats[:,0][xlab])
         plt.legend()
         plt.axhline(ls='--', color='gray')
         plt.title(self.name)
@@ -119,10 +119,10 @@ if __name__ == '__main__':
     BPMESO = Meso('BP', bp_micros)
     SQMESO = Meso('SQ', sq_micros)
 
-    stat='max%'
+    stat='inol'
     DLMESO.plot(stat); plt.grid()
     BPMESO.plot(stat); plt.grid()
     SQMESO.plot(stat); plt.grid()
-    DLMESO.plot_micros(stat); plt.grid()
-    BPMESO.plot_micros(stat); plt.grid()
-    SQMESO.plot_micros(stat); plt.grid()
+    # DLMESO.plot_micros(stat); plt.grid()
+    # BPMESO.plot_micros(stat); plt.grid()
+    # SQMESO.plot_micros(stat); plt.grid()
