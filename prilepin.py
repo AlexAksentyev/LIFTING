@@ -53,6 +53,7 @@ class Session:
                 ('sets', int), ('reps', int),
                 ('inol', float), ('vol', float),
                 ('inol/set', float), ('vol/set', float)]
+    _effort_type = None # defined in children
     WRM = np.array([(.3, 1, 5),
                         (.5, 1, 5),
                         (.7, 1, 3),
@@ -76,6 +77,9 @@ class Session:
     @property
     def sec_lift(self):
         return self._sec_lift
+    @property
+    def effort_type(self):
+        return self._effort_type
 
     def _comp_stats(self, lift, tbl):
         wgts = np.array([lift.pick_closest(wgt)
@@ -143,6 +147,7 @@ class MaxEffDay(Session):
                      (6, .92, 3, 2),
                      (7, .97, 3, 2)],
                         dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
+    _effort_type = 'MAX'
 
 class DynEffDay(Session):
         WEEK = np.array([(1, .55, 5, 5),
@@ -151,7 +156,8 @@ class DynEffDay(Session):
                          (5, .55, 6, 4),
                          (6, .60, 5, 4),
                          (7, .65, 6, 3)],
-                            dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])        
+                            dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
+        _effort_type = 'DYN'
 
 ############################################################
 BSQ = Lift('BACK SQ', 140, 20, 60)

@@ -12,8 +12,12 @@ class Cycle:
         self.stats = None
         self.name = name
 
-    def _plot_base(self, stat, stats=None):
+    def _plot_base(self, stat, day_type='all', stats=None):
         if stats is None: stats = self.stats
+        day_type = day_type.upper()
+        ncol = stats.shape[1]
+        stats = stats[stats['type']==day_type].reshape(-1,ncol) if day_type!='ALL' else stats
+        print(DataFrame(stats[:,1]))
         xlab = stats.dtype.names[0]
         pname = 'primary'
         sname = 'secondary'
@@ -30,8 +34,8 @@ class Cycle:
         plt.ylabel(stat)
         plt.xlabel(xlab)
 
-    def plot(self, stat='inol'):
-        self._plot_base(stat)
+    def plot(self, stat='inol', day_type='all'):
+        self._plot_base(stat, day_type)
         if stat=='inol':
             plt.axhline(y=.75, ls='--', lw=.5, color='blue')
             plt.axhline(y=1.0, ls='--', lw=.5, color='blue')
@@ -39,13 +43,9 @@ class Cycle:
             plt.axhline(y=2.0, ls='--', lw=.5, color='red')
 
 class Micro(Cycle):
-    def __init__(self, name, number, **name_daytuple):
+    def __init__(self, name, number, **name_day):
         super().__init__(name)
-        self._days = name_daytuple
-        # prepare for the computation of stats
-        for name, day in self._days.items():
-            if not isinstance(day, tuple):
-                self._days[name] = (day,)
+        self._days = name_day
 
         # compute stats
         self.stats = self._compute_stats(number)     
@@ -56,18 +56,18 @@ class Micro(Cycle):
     
     def _compute_stats(self, week_num):
         stats = np.empty((len(self._days.keys()), 3),
-                         dtype = list(zip([ 'cycle', 'inol', 'vol', 'max%', 'maxW'], [object]+[float]*4)) )
+                         dtype = list(zip([ 'day', 'type', 'inol', 'vol', 'max%', 'maxW'],
+                                          [object]*2+[float]*4)) )
         stat = lambda lift, name: tbl[lift][name].sum()
         idx = 0
         for name, day in self._days.items():
             pri_vol = 0; pri_inol = 0
             sec_vol = 0; sec_inol = 0
-            for movement in day:
-                tbl = movement.week(week_num, silent=True)
-                pri_vol  += stat('pri', 'vol')
-                pri_inol += stat('pri', 'inol')
-                sec_vol  += stat('sec', 'vol')
-                sec_inol += stat('sec', 'inol')
+            tbl = day.week(week_num, silent=True)
+            pri_vol  += stat('pri', 'vol')
+            pri_inol += stat('pri', 'inol')
+            sec_vol  += stat('sec', 'vol')
+            sec_inol += stat('sec', 'inol')
             net_vol = pri_vol + sec_vol
             net_inol = pri_inol + sec_inol
             pri_maxP = tbl['pri']['pct'][-1]
@@ -77,9 +77,9 @@ class Micro(Cycle):
             sec_maxW = tbl['sec']['wgt'][-1] if sec_wsets!=0 else 0
             net_maxP = max(pri_maxP, sec_maxP)
             net_maxW = max(pri_maxW, sec_maxW)
-            stats[idx][0] = name+str(week_num), net_inol, net_vol, net_maxP, net_maxW
-            stats[idx][1] = name+str(week_num), pri_inol, pri_vol, pri_maxP, pri_maxW
-            stats[idx][2] = name+str(week_num), sec_inol, sec_vol, sec_maxP, sec_maxW
+            stats[idx][0] = name+str(week_num), day.effort_type, net_inol, net_vol, net_maxP, net_maxW
+            stats[idx][1] = name+str(week_num), day.effort_type, pri_inol, pri_vol, pri_maxP, pri_maxW
+            stats[idx][2] = name+str(week_num), day.effort_type, sec_inol, sec_vol, sec_maxP, sec_maxW
             idx += 1
         return stats
 
@@ -95,10 +95,10 @@ class Meso(Cycle):
             tbl0 = cyc.stats
             for i in range(3):
                 tbl = DataFrame(tbl0[:,i]).sum(axis=0)
-                self._micro_stats[idx, i] = tbl['cycle'], tbl['inol'], tbl['vol']
+                self._micro_stats[idx, i] = tbl['day'], tbl['inol'], tbl['vol']
 
     def plot_micros(self, stat='inol'):
-        super()._plot_base(stat, self._micro_stats)
+        super()._plot_base(stat, 'all', stats=self._micro_stats)
         plt.axhline(y=1.00, ls='--', lw=.5, color='blue')
         plt.axhline(y=1.98, ls='--', lw=.5, color='blue')
         plt.axhline(y=2.02, ls='--', lw=.5, color='red')
