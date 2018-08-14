@@ -145,7 +145,7 @@ class MaxEffDay(Session):
                      (3, .92, 4, 2),
                      (5, .87, 5, 3),
                      (6, .92, 3, 2),
-                     (7, .97, 3, 2)],
+                     (7, .96, 3, 2)],
                         dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
     _effort_type = 'MAX'
 
