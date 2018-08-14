@@ -43,7 +43,10 @@ class Lift:
         load = np.arange(self._min_wgt, wgt+5, 2.5)
         wgts = load[abs(load-wgt)<2.5]
         if len(wgts)<2: return wgts[0]
-        else: return wgts[1]
+        else:
+            delta = abs(wgts - wgt)
+            best_wgt = wgts[0] if delta[0]<delta[1] else wgts[1]
+            return best_wgt
 
 class Session:
     _typespec = [('pct', float), ('wgt', float),
@@ -133,12 +136,12 @@ class Session:
         return dict(pri=pri_tbl, sec=sec_tbl)
         
 class MaxEffDay(Session):
-    WEEK = np.array([(1, .82, 5, 3),
+    WEEK = np.array([(1, .82, 4, 4),
                      (2, .87, 5, 3),
-                     (3, .93, 3, 2),
-                     (5, .85, 5, 3),
-                     (6, .93, 3, 2),
-                     (7, .95, 3, 2)],
+                     (3, .92, 4, 2),
+                     (5, .87, 5, 3),
+                     (6, .92, 3, 2),
+                     (7, .97, 3, 2)],
                         dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
 
 class DynEffDay(Session):
