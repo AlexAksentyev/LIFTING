@@ -56,7 +56,7 @@ class Micro(Cycle):
     
     def _compute_stats(self, week_num):
         stats = np.empty((len(self._days.keys()), 3),
-                         dtype = list(zip([ 'day', 'type', 'inol', 'vol', 'max%', 'maxW'],
+                         dtype = list(zip([ 'day', 'type', 'inol', 'vol', 'maxP', 'maxW'],
                                           [object]*2+[float]*4)) )
         stat = lambda lift, name: tbl[lift][name].sum()
         idx = 0
