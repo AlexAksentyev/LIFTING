@@ -56,7 +56,7 @@ class Micro(Cycle):
     
     def _compute_stats(self, week_num):
         stats = np.empty((len(self._days.keys()), 3),
-                         dtype = list(zip([ 'cycle', 'inol', 'vol', 'max%'], [object]+[float]*3)) )
+                         dtype = list(zip([ 'cycle', 'inol', 'vol', 'max%', 'maxW'], [object]+[float]*4)) )
         stat = lambda lift, name: tbl[lift][name].sum()
         idx = 0
         for name, day in self._days.items():
@@ -71,12 +71,15 @@ class Micro(Cycle):
             net_vol = pri_vol + sec_vol
             net_inol = pri_inol + sec_inol
             pri_maxP = tbl['pri']['pct'][-1]
+            pri_maxW = tbl['pri']['wgt'][-1]
             sec_wsets = tbl['sec']['sets'][-1] # b/c secondary lift may have 0 sets (unlike primary)
             sec_maxP = tbl['sec']['pct'][-1] if sec_wsets!=0 else 0
+            sec_maxW = tbl['sec']['wgt'][-1] if sec_wsets!=0 else 0
             net_maxP = max(pri_maxP, sec_maxP)
-            stats[idx][0] = name+str(week_num), net_inol, net_vol, net_maxP
-            stats[idx][1] = name+str(week_num), pri_inol, pri_vol, pri_maxP
-            stats[idx][2] = name+str(week_num), sec_inol, sec_vol, sec_maxP
+            net_maxW = max(pri_maxW, sec_maxW)
+            stats[idx][0] = name+str(week_num), net_inol, net_vol, net_maxP, net_maxW
+            stats[idx][1] = name+str(week_num), pri_inol, pri_vol, pri_maxP, pri_maxW
+            stats[idx][2] = name+str(week_num), sec_inol, sec_vol, sec_maxP, sec_maxW
             idx += 1
         return stats
 
@@ -107,6 +110,7 @@ class Meso(Cycle):
             
     
 if __name__ == '__main__':
+    stat = sys.argv[1] if len(sys.argv)>1 else 'inol'
     plt.close('all')
     plt.ion()
     dl_micros = []; bp_micros = []; sq_micros = []
@@ -119,10 +123,9 @@ if __name__ == '__main__':
     BPMESO = Meso('BP', bp_micros)
     SQMESO = Meso('SQ', sq_micros)
 
-    stat='inol'
     DLMESO.plot(stat); plt.grid()
-    BPMESO.plot(stat); plt.grid()
-    SQMESO.plot(stat); plt.grid()
-    # DLMESO.plot_micros(stat); plt.grid()
+    # BPMESO.plot(stat); plt.grid()
+    # SQMESO.plot(stat); plt.grid()
+    DLMESO.plot_micros(stat); plt.grid()
     # BPMESO.plot_micros(stat); plt.grid()
     # SQMESO.plot_micros(stat); plt.grid()
