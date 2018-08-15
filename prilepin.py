@@ -10,6 +10,7 @@ PRILEPIN = np.array([(0.0, .70, 18, 30, 24),
     
 def useful(reps, pct):
     row = PRILEPIN[np.logical_and(pct>=PRILEPIN['lowP'], pct<PRILEPIN['upP'])]
+    reps = row['optR'] if reps>row['upR'] else reps
     return reps >= row['lowR'] and reps <= row['upR']
 
 class Lift:
