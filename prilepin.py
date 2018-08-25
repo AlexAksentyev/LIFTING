@@ -115,8 +115,8 @@ class Session:
 
         sec = self._sec_lift
         sec_inol = round(self._targ_inol - pri_inol, 2)
-        sec_tbl = np.array([(.50, 5, .25*sec_inol),
-                            (.75, 5, .75*sec_inol)],
+        sec_tbl = np.array([(.50, 5, .2), # inol=.2 == 2 x 5 @ 50%
+                            (.75, 5, (sec_inol-.2))], # spend the rest on work sets
                             dtype=[('pct', float), ('reps', int), ('inols', float)])
         sec_pct, sec_wgt, ssets, sreps, sinol, svol, ssinol, ssvol = self._comp_stats(sec, sec_tbl)
         sec_inol = sinol.sum() # recompute after rep readjustment
