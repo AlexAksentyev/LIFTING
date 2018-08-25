@@ -17,7 +17,12 @@ class Cycle:
         day_type = day_type.upper()
         ncol = stats.shape[1]
         stats = stats[stats['type']==day_type].reshape(-1,ncol) if day_type!='ALL' else stats
+        print('***** PRIMARY *****')
         print(DataFrame(stats[:,1]))
+        print('***** SECONDARY *****')
+        print(DataFrame(stats[:,2]))
+        print('***** BOTH *****')
+        print(DataFrame(stats[:,0]))
         xlab = stats.dtype.names[0]
         pname = 'primary'
         sname = 'secondary'
@@ -123,9 +128,9 @@ if __name__ == '__main__':
     BPMESO = Meso('BP', bp_micros)
     SQMESO = Meso('SQ', sq_micros)
 
-    DLMESO.plot(stat); plt.grid()
+    # DLMESO.plot(stat); plt.grid()
     # BPMESO.plot(stat); plt.grid()
     # SQMESO.plot(stat); plt.grid()
-    DLMESO.plot_micros(stat); plt.grid()
+    # DLMESO.plot_micros(stat); plt.grid()
     # BPMESO.plot_micros(stat); plt.grid()
     # SQMESO.plot_micros(stat); plt.grid()
