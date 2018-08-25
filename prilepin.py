@@ -152,11 +152,11 @@ class MaxEffDay(Session):
 
 class DynEffDay(Session):
         WEEK = np.array([(1, .55, 5, 5),
-                         (2, .60, 5, 5),
-                         (3, .65, 5, 5),
-                         (5, .55, 6, 4),
+                         (2, .60, 5, 4),
+                         (3, .65, 6, 4),
+                         (5, .55, 5, 5),
                          (6, .60, 5, 4),
-                         (7, .65, 6, 3)],
+                         (7, .65, 6, 4)],
                             dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
         _effort_type = 'DYN'
 

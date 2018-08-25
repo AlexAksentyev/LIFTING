@@ -128,9 +128,9 @@ if __name__ == '__main__':
     BPMESO = Meso('BP', bp_micros)
     SQMESO = Meso('SQ', sq_micros)
 
-    # DLMESO.plot(stat); plt.grid()
+    DLMESO.plot(stat, 'dyn'); plt.grid() 
     # BPMESO.plot(stat); plt.grid()
-    # SQMESO.plot(stat); plt.grid()
-    # DLMESO.plot_micros(stat); plt.grid()
+    # SQMESO.plot(stat, 'dyn'); plt.grid() 
+    DLMESO.plot_micros(stat); plt.grid() 
     # BPMESO.plot_micros(stat); plt.grid()
-    # SQMESO.plot_micros(stat); plt.grid()
+    # SQMESO.plot_micros(stat); plt.grid() 
