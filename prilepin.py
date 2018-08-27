@@ -121,7 +121,7 @@ class Session:
         sec_pct, sec_wgt, ssets, sreps, sinol, svol, ssinol, ssvol = self._comp_stats(sec, sec_tbl)
         sec_inol = sinol.sum() # recompute after rep readjustment
         sec_tbl = np.array(list(zip(sec_pct, sec_wgt, ssets, sreps, sinol, svol, ssinol, ssvol)), dtype=self._typespec)
-        if not useful(ssets[1]*sreps[1], sec_pct[1]): # if the work sets aren't useful, don't include sec lift
+        if not useful(ssets[-1]*sreps[-1], sec_pct[-1]): # if the work sets aren't useful, don't include sec lift
             sec_tbl['sets'] *= 0
             sec_tbl['reps'] *= 0
             sec_tbl['inol'] *= 0
