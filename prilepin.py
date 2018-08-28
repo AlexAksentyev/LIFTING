@@ -51,7 +51,7 @@ class Lift:
 
 class Session:
     _typespec = [('pct', float), ('wgt', float),
-                ('sets', int), ('reps', int),
+                ('sets', int),   ('reps', int),
                 ('inol', float), ('vol', float),
                 ('inol/set', float), ('vol/set', float)]
     _effort_type = None # defined in children
@@ -141,12 +141,12 @@ class Session:
         return dict(pri=pri_tbl, sec=sec_tbl)
         
 class MaxEffDay(Session):
-    WEEK = np.array([(1, .82, 4, 4),
-                     (2, .87, 5, 3),
-                     (3, .92, 4, 2),
-                     (5, .87, 5, 3),
-                     (6, .92, 3, 2),
-                     (7, .96, 3, 2)],
+    WEEK = np.array([(1, .82, 4, 4), # use either
+                     (2, .87, 5, 3), # of these
+                     (3, .92, 4, 2), # as a
+                     (5, .87, 5, 3),  ## separate 
+                     (6, .92, 3, 2),  ## meso-
+                     (7, .96, 3, 2)], ## cycle
                         dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
     _effort_type = 'MAX'
 
@@ -187,7 +187,7 @@ if __name__ == '__main__':
         for day in silent.keys():
             silent[day]=False
             
-    dlmax_tbl = DLMAX.week(week_num, silent['WED'])
-    bpmax_tbl = BPMAX.week(week_num, silent['FRI'])
-    dldyn_tbl = DLDYN.week(week_num, silent['SUN'])
-    bpdyn_tbl = BPDYN.week(week_num, silent['SUN'])
+    low_max_tbl = SQMAX.week(week_num, silent['WED'])
+    up_max_tbl = BPMAX.week(week_num, silent['FRI'])
+    low_dyn_tbl = SQDYN.week(week_num, silent['SUN'])
+    up_dyn_tbl = BPDYN.week(week_num, silent['SUN'])
