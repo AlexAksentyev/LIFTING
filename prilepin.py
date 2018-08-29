@@ -135,8 +135,9 @@ class Session:
             print('        '+self._week_day)
             print('PRIMARY ({}); TOT INOL: {:4.2f}; TOT VOL: {:4.0f} [kgs]'.format(pri.name, pri_inol, pri_vol))
             print(pds.DataFrame(pri_tbl, index=[week_num]*len(pri_tbl)))
-            print('SECONDARY ({}); TOT INOL: {:4.2f}; TOT VOL: {:4.0f} [kgs]'.format(sec.name, sec_inol, sec_vol))
-            print(pds.DataFrame(sec_tbl, index=[week_num]*len(sec_tbl)))
+            if not sec_vol==0:
+                print('SECONDARY ({}); TOT INOL: {:4.2f}; TOT VOL: {:4.0f} [kgs]'.format(sec.name, sec_inol, sec_vol))
+                print(pds.DataFrame(sec_tbl, index=[week_num]*len(sec_tbl)))
             print('TOT INOL: {:4.2f}; TOT VOL: {:4.0f}'.format(pri_inol+sec_inol, pri_vol+sec_vol))
         return dict(pri=pri_tbl, sec=sec_tbl)
         
@@ -163,7 +164,7 @@ class DynEffDay(Session):
 ############################################################
 BSQ = Lift('BACK SQ', 140, 20, 60)
 FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
-SDL = Lift('SUMO DL', 137.5, 20, 60)
+SDL = Lift('SUMO DL', 145, 20, 60)
 CDL = Lift('CONV DL', 104, 20, 60)
 FBP = Lift('FLAT BP', 115, 12.5, 32.5)
 IBP = Lift('INCLINE BP', 52.5, 12.5, 32.5)
@@ -173,21 +174,21 @@ DLMAX = MaxEffDay('WEDNSDAY (Max Effort DL)', SDL, CDL)
 DLDYN = DynEffDay('SUNDAY (Dynamic Effort DL)', SDL, BSQ)
 BPMAX = MaxEffDay('FRIDAY (Max Effort BP)', FBP, IBP)
 BPDYN = DynEffDay('SUNDAY (Dynamic Effort BP)', FBP, OHP)
-SQMAX = MaxEffDay('SUNDAY (Max Effort SQ)', BSQ, FSQ)
-SQDYN = DynEffDay('WEDNSDAY (Dynamic Effort SQ)', BSQ, SDL)
+SQMAX = MaxEffDay('WEDNSDAY (Max Effort SQ)', BSQ, FSQ)
+SQDYN = DynEffDay('SUNDAY (Dynamic Effort SQ)', BSQ, SDL)
     
 if __name__ == '__main__':
     week_num = int(sys.argv[1])
     day = sys.argv[2].upper() if len(sys.argv)>2 else 'ALL'
 
-    silent = dict(WED=True, FRI=True, SUN=True)
+    silent = dict(MAX=True, DYN=True)
     if day!='ALL':
         silent[day[:3]]=False
     else:
         for day in silent.keys():
             silent[day]=False
             
-    low_max_tbl = SQMAX.week(week_num, silent['WED'])
-    up_max_tbl = BPMAX.week(week_num, silent['FRI'])
-    low_dyn_tbl = SQDYN.week(week_num, silent['SUN'])
-    up_dyn_tbl = BPDYN.week(week_num, silent['SUN'])
+    low_max_tbl = SQMAX.week(week_num, silent['MAX'])
+    up_max_tbl = BPMAX.week(week_num, silent['MAX'])
+    low_dyn_tbl = SQDYN.week(week_num, silent['DYN'])
+    up_dyn_tbl = BPDYN.week(week_num, silent['DYN'])
