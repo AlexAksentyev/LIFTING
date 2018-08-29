@@ -187,7 +187,7 @@ if __name__ == '__main__':
         for day in silent.keys():
             silent[day]=False
             
-    dlmax_tbl = DLMAX.week(week_num, silent['WED'])
-    bpmax_tbl = BPMAX.week(week_num, silent['FRI'])
-    dldyn_tbl = DLDYN.week(week_num, silent['SUN'])
-    bpdyn_tbl = BPDYN.week(week_num, silent['SUN'])
+    low_max_tbl = SQMAX.week(week_num, silent['WED'])
+    up_max_tbl = BPMAX.week(week_num, silent['FRI'])
+    low_dyn_tbl = SQDYN.week(week_num, silent['SUN'])
+    up_dyn_tbl = BPDYN.week(week_num, silent['SUN'])
