@@ -51,7 +51,7 @@ class Lift:
 
 class Session:
     _typespec = [('pct', float), ('wgt', float),
-                ('sets', int), ('reps', int),
+                ('sets', int),   ('reps', int),
                 ('inol', float), ('vol', float),
                 ('inol/set', float), ('vol/set', float)]
     _effort_type = None # defined in children
@@ -141,12 +141,12 @@ class Session:
         return dict(pri=pri_tbl, sec=sec_tbl)
         
 class MaxEffDay(Session):
-    WEEK = np.array([(1, .82, 4, 4),
-                     (2, .87, 5, 3),
-                     (3, .92, 4, 2),
-                     (5, .87, 5, 3),
-                     (6, .92, 3, 2),
-                     (7, .96, 3, 2)],
+    WEEK = np.array([(1, .82, 4, 4), # use either
+                     (2, .87, 5, 3), # of these
+                     (3, .92, 4, 2), # as a
+                     (5, .87, 5, 3),  ## separate 
+                     (6, .92, 3, 2),  ## meso-
+                     (7, .96, 3, 2)], ## cycle
                         dtype=[('WN', int), ('pct', float), ('sets', int), ('reps', int)])
     _effort_type = 'MAX'
 

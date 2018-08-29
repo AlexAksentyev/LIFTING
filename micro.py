@@ -9,7 +9,6 @@ reload(PLP)
 
 class Cycle:
     def __init__(self, name):
-        self.stats = None
         self.name = name
 
     def _plot_base(self, stat, day_type='all', stats=None):
@@ -34,7 +33,7 @@ class Cycle:
         plt.plot(stats[:,0][stat], '--*', label='tot', lw=2.5)
         plt.xticks(range(stats.shape[0]), stats[:,0][xlab])
         plt.legend()
-        plt.axhline(ls='--', color='gray')
+        #plt.axhline(ls='--', color='gray')
         plt.title(self.name)
         plt.ylabel(stat)
         plt.xlabel(xlab)
@@ -48,18 +47,15 @@ class Cycle:
             plt.axhline(y=2.0, ls='--', lw=.5, color='red')
 
 class Micro(Cycle):
-    def __init__(self, name, number, **name_day):
+    def __init__(self, name, **name_day):
         super().__init__(name)
-        self._days = name_day
-
-        # compute stats
-        self.stats = self._compute_stats(number)     
+        self._days = name_day  
 
     def day(self, name):
         d = self._days[name.upper()]
         return d[0] if len(d)==1 else d
     
-    def _compute_stats(self, week_num):
+    def stats(self, week_num):
         stats = np.empty((len(self._days.keys()), 3),
                          dtype = list(zip([ 'day', 'type', 'inol', 'vol', 'maxP', 'maxW'],
                                           [object]*2+[float]*4)) )
@@ -89,15 +85,15 @@ class Micro(Cycle):
         return stats
 
 class Meso(Cycle):
-    def __init__(self, name, micro_lst):
+    def __init__(self, name, micro):
         super().__init__(name)
-        self._micros = micro_lst
-        self.stats = np.concatenate([cyc.stats for cyc in self._micros])
+        weeks = [5,6,7]
+        stats = [micro.stats(wn) for wn in weeks]
+        self._stats = np.concatenate(stats)
 
-        self._micro_stats = np.empty((len(self._micros), 3),
+        self._micro_stats = np.empty((len(weeks), 3),
                                      dtype=[('cycle', object), ('inol', float), ('vol', float)])
-        for idx, cyc in enumerate(self._micros):
-            tbl0 = cyc.stats
+        for idx, tbl0 in enumerate(stats):
             for i in range(3):
                 tbl = DataFrame(tbl0[:,i]).sum(axis=0)
                 self._micro_stats[idx, i] = tbl['day'], tbl['inol'], tbl['vol']
@@ -112,21 +108,23 @@ class Meso(Cycle):
         
     def __getitem__(self, idx):
         return self._micros[idx]
+
+    @property
+    def stats(self):
+        return self._stats
+    @property
+    def micro_stats(self):
+        return self._micro_stats
             
     
 if __name__ == '__main__':
     stat = sys.argv[1] if len(sys.argv)>1 else 'inol'
     plt.close('all')
     plt.ion()
-    dl_micros = []; bp_micros = []; sq_micros = []
-    for wn in [1,2,3,5,6,7]:
-        dl_micros.append(Micro('DL', wn, WED=PLP.DLMAX, SUN=PLP.DLDYN))
-        bp_micros.append(Micro('BP', wn, FRI=PLP.BPMAX, SUN=PLP.BPDYN))
-        sq_micros.append(Micro('SQ', wn, WED=PLP.SQMAX, SUN=PLP.SQDYN))
 
-    DLMESO = Meso('DL', dl_micros)
-    BPMESO = Meso('BP', bp_micros)
-    SQMESO = Meso('SQ', sq_micros)
+    DLMESO = Meso('DL', Micro('DL', WED=PLP.DLMAX, SUN=PLP.DLDYN))
+    BPMESO = Meso('BP', Micro('BP', FRI=PLP.BPMAX, SUN=PLP.BPDYN))
+    SQMESO = Meso('SQ', Micro('SQ', WED=PLP.SQMAX, SUN=PLP.SQDYN))
 
     DLMESO.plot(stat, 'dyn'); plt.grid() 
     # BPMESO.plot(stat); plt.grid()
