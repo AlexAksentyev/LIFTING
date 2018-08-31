@@ -121,7 +121,7 @@ CHT = Lift('CABLE HIP THRUST', 87.5, 0, 20)
 FBP = Lift('FLAT BP', 125, 12.5, 32.5)
 IBP = Lift('INCLINE BP', 52.5, 12.5, 32.5)
 CPF = Lift('CABLE PEC FLY', 18.75, 0,  6.5)
-RBP = Lift('REVERSE BP', 52.5, 12.5, 31.5)
+RBP = Lift('REVERSE BP', 52.5, 12.5, 32.5)
     
 OHP = Lift('OHP', 70, 12.5, 32.5)
 
