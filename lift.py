@@ -21,7 +21,8 @@ WRM = np.array([(.3, 1, 5),
                dtype=PSR_t)
 
 def _get_rows(tbl, wn):
-    main = tbl[tbl['WN']==wn][['pct','sets','reps']]
+    wn = (wn-1)%len(tbl)
+    main = tbl[[wn]][['pct','sets','reps']]
     wrm = WRM[WRM['pct']<main['pct']]
     return np.concatenate([wrm, main])
 
@@ -71,8 +72,9 @@ class Lift:
         set_inols = np.round(np.divide(inols, sets, where=sets!=0), 2)
         set_vols = np.round(np.divide(vols, sets, where=sets!=0))
         ret_tbl = np.array(list(zip(pcts, wgts, sets, reps, inols, vols, set_inols, set_vols)), dtype=FULL_t)
-        ii=np.unique(ret_tbl['wgt'], return_index=True)[1]
-        return ret_tbl[ii]
+        upi=np.unique(ret_tbl['pct'], return_index=True)[1]
+        uri=np.unique(ret_tbl['reps'], return_index=True)[1]
+        return ret_tbl#[ii]
 
     def hyp(self, wn):
         return self._comp_stats(_get_rows(self._HYP, wn))
