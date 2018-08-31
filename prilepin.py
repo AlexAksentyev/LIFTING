@@ -20,7 +20,7 @@ class Lift:
         self.name = name
         self.RM1 = RM1
         self.bar = bar_wgt
-        self._min_wgt = min_wgt # used for controling the secondary lift
+        self._min_wgt = min_wgt 
         
     def __repr__(self):
         return str(pds.DataFrame(dict(RM1 = self.RM1, BAR=self._bar_wgt), index=[0]))
