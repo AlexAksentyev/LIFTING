@@ -26,6 +26,12 @@ class Micro:
         dyn_tbl = self.dyn_eff(num, silent)
         return (max_tbl, dyn_tbl)
 
+    def __repr__(self):
+        for i in range(1,4):
+            print('WEEK #', i)
+            dat = self.__call__(i)
+        return ''
+
     def plot(self, stat='inol', day_type='both', weeks=range(1,4)):
         n_rec = len(weeks)
         ps = np.empty((n_rec,2), dtype=[('day', object), (stat, float)])
