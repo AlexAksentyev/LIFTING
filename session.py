@@ -1,7 +1,10 @@
 import numpy as np
 from pandas import DataFrame
-from lift import Lift, FULL_t
+import lift
+from importlib import reload
 from numpy.lib.recfunctions import append_fields
+
+reload(lift)
 
 class Session:
     _struct = None
@@ -39,6 +42,9 @@ class Session:
     @property
     def sec_lift(self):
         return self._sec_lift
+    @property
+    def label(self):
+        return self._label
 
     def __call__(self, week_num, silent=False):
         pri_type = self._struct['PRI']
@@ -57,6 +63,7 @@ class Session:
         sec_inol = round(sec_tbl['inol'].sum(), 2)
         sec_vol  = round(sec_tbl['vol'].sum(), 2)
         if not silent:
+            print("**********", self.label, "**********")
             print(self.pri_lift.name, "INOL:", pri_inol, "VOL:", pri_vol)
             print(DataFrame(pri_tbl))
             print(self.sec_lift.name, "INOL:", sec_inol, "VOL:", sec_vol)
@@ -71,30 +78,16 @@ class MaxEffDay(Session):
 
 class DynEffDay(Session):
     _struct = dict(PRI='pow', SEC='hyp')
+    
 
-if __name__ == '__main__':
-    BSQ = Lift('BACK SQ', 140, 20, 60)
-    FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
+DLMAX = MaxEffDay('WEDNSDAY (Max Effort DL)', lift.SDL, lift.CHT)
+DLDYN = DynEffDay('SUNDAY (Dynamic Effort DL)', lift.SDL, lift.BSQ)
     
-    SDL = Lift('SUMO DL', 145, 20, 60)
-    CDL = Lift('CONV DL', 104, 20, 60)
-    CHT = Lift('CABLE HIP THRUST', 87.5, 0, 20)
+BPMAX = MaxEffDay('FRIDAY (Max Effort BP)', lift.FBP, lift.CPF)
+BPDYN = DynEffDay('SUNDAY (Dynamic Effort BP)', lift.FBP, lift.OHP)
     
-    FBP = Lift('FLAT BP', 125, 12.5, 32.5)
-    IBP = Lift('INCLINE BP', 52.5, 12.5, 32.5)
-    CPF = Lift('CABLE PEC FLY', 18.75, 0,  6.5)
-    RBP = Lift('REVERSE BP', 52.5, 12.5, 31.5)
+SQMAX = MaxEffDay('WEDNSDAY (Max Effort SQ)', lift.BSQ, lift.FSQ)
+SQDYN = DynEffDay('SUNDAY (Dynamic Effort SQ)', lift.BSQ, lift.SDL)
     
-    OHP = Lift('OHP', 70, 12.5, 32.5)
-
-    DLMAX = MaxEffDay('WEDNSDAY (Max Effort DL)', SDL, CHT)
-    DLDYN = DynEffDay('SUNDAY (Dynamic Effort DL)', SDL, BSQ)
-    
-    BPMAX = MaxEffDay('FRIDAY (Max Effort BP)', FBP, CPF)
-    BPDYN = DynEffDay('SUNDAY (Dynamic Effort BP)', FBP, OHP)
-    
-    SQMAX = MaxEffDay('WEDNSDAY (Max Effort SQ)', BSQ, FSQ)
-    SQDYN = DynEffDay('SUNDAY (Dynamic Effort SQ)', BSQ, SDL)
-    
-    OHPMAX = MaxEffDay('FRIDAY (Max Effort OHP)', OHP, RBP)
-    OHPDYN = DynEffDay('SUNDAY (Dynamic Effort OHP)', OHP, FBP)
+OHPMAX = MaxEffDay('FRIDAY (Max Effort OHP)', lift.OHP, lift.RBP)
+OHPDYN = DynEffDay('SUNDAY (Dynamic Effort OHP)', lift.OHP, lift.FBP)

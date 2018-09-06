@@ -36,9 +36,9 @@ class Lift:
                       (2, .60, 5, 4),
                       (3, .65, 6, 4)],
                      dtype=WPSR_t)
-    _STR = np.array([(1, .87, 5, 3), 
-                     (2, .92, 3, 2), 
-                     (3, .96, 3, 2)],
+    _STR = np.array([(1, .85, 5, 3), 
+                     (2, .93, 4, 2), 
+                     (3, .97, 3, 2)],
                     dtype=WPSR_t)
     _ACC = np.array([(1, .4, 3, 15), 
                      (2, .4, 3, 15), 
@@ -109,7 +109,20 @@ class Lift:
             best_wgt = wgts[0] if delta[0]<delta[1] else wgts[1]
             return best_wgt
 
-if __name__ == '__main__':
-    SDL = Lift('SUMO', 145, 20, 60)
-    FBP = Lift('FBP', 125, 12.5, 52.5)
-    CDL = Lift('CONV', 105, 20, 60)
+
+# ******************************
+BSQ = Lift('BACK SQ', 145, 20, 60)
+FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
+MLP = Lift('LEG PRESS', 300, 0, 40)
+
+SDL = Lift('SUMO DL', 145, 20, 60)
+CDL = Lift('CONV DL', 104, 20, 60)
+CHT = Lift('CABLE HIP THRUST', 87.5, 0, 20)
+    
+FBP = Lift('FLAT BP', 125, 12.5, 32.5)
+IBP = Lift('INCLINE BP', 52.5, 12.5, 32.5)
+CPF = Lift('CABLE PEC FLY', 18.75, 0,  6.5)
+RBP = Lift('REVERSE BP', 52.5, 12.5, 32.5)
+    
+OHP = Lift('OHP', 65, 12.5, 32.5)
+
