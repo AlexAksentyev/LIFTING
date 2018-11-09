@@ -66,7 +66,7 @@ class Micro:
 
 
 if __name__ == '__main__':
-    SQMICRO = Micro('BSQ Strength', lift.BSQ, lift.SDL, lift.MLP)
-    DLMICRO = Micro('SDL Strength', lift.SDL, lift.BSQ, lift.CHT)
-    OHPMICRO = Micro('OHP Strength', lift.OHP, lift.FBP, lift.RBP)
-    FBPMICRO = Micro('FBP Strength', lift.FBP, lift.OHP, lift.CPF)
+    BSQMICRO = Micro('BSQ Strength', lift.BSQ, lift.SDL, lift.MLP)
+    SDLMICRO = Micro('SDL Strength', lift.SDL, lift.BSQ, lift.FSQ)
+    OHPMICRO = Micro('OHP Strength', lift.OHP, lift.FBP, lift.IBP)
+    FBPMICRO = Micro('FBP Strength', lift.FBP, lift.OHP, lift.DIP)

@@ -13,7 +13,7 @@ FULL_t = [('pct', float), ('wgt', float),
           ('inol', float), ('vol', float),
           ('inol/set', float), ('vol/set', float)]
 
-WRM = np.array([(.3, 1, 5),
+WRM = np.array([(.3, 1, 8),
                 (.5, 1, 5),
                 (.7, 1, 3),
                 (.8, 1, 2),
@@ -111,18 +111,19 @@ class Lift:
 
 
 # ******************************
-BSQ = Lift('BACK SQ', 145, 20, 60)
+BSQ = Lift('BACK SQ', 147.5, 20, 60)
 FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
 MLP = Lift('LEG PRESS', 300, 0, 40)
 
-SDL = Lift('SUMO DL', 145, 20, 60)
+SDL = Lift('SUMO DL', 147.5, 20, 60)
 CDL = Lift('CONV DL', 104, 20, 60)
 CHT = Lift('CABLE HIP THRUST', 87.5, 0, 20)
     
 FBP = Lift('FLAT BP', 125, 12.5, 32.5)
-IBP = Lift('INCLINE BP', 52.5, 12.5, 32.5)
+IBP = Lift('INCLINE BP', 92.5, 12.5, 32.5)
 CPF = Lift('CABLE PEC FLY', 18.75, 0,  6.5)
 RBP = Lift('REVERSE BP', 52.5, 12.5, 32.5)
+DIP = Lift('DIPS', 100, 0, 73)
     
-OHP = Lift('OHP', 65, 12.5, 32.5)
+OHP = Lift('OHP', 70, 12.5, 32.5)
 
