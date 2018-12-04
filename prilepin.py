@@ -162,7 +162,7 @@ class DynEffDay(Session):
         _effort_type = 'DYN'
 
 ############################################################
-BSQ = Lift('BACK SQ', 140, 20, 60)
+BSQ = Lift('BACK SQ', 145, 20, 60)
 FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
 SDL = Lift('SUMO DL', 145, 20, 60)
 CDL = Lift('CONV DL', 104, 20, 60)

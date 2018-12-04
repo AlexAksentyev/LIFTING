@@ -1,9 +1,9 @@
 import numpy as np
 from pandas import DataFrame
-PRILEPIN = np.array([(0.0, .70, 18, 30, 24),
-                     (.70, .80, 12, 24, 18),
-                     (.80, .90, 10, 20, 15),
-                     (.90, 1.0,  4, 10,  7)],
+PRILEPIN = np.array([(0.0, .70, 18, 30, 24), # 3--6
+                     (.70, .80, 12, 24, 18), # 3--6
+                     (.80, .90, 10, 20, 15), # 2--4
+                     (.90, 1.0,  4, 10,  7)],# 1--2
                     dtype=list(zip(['lowP', 'upP', 'lowR', 'upR', 'optR'], [float]*2 + [int]*3)))
 
 PSR_t = [('pct', float), ('sets', int), ('reps', int)]
@@ -13,17 +13,19 @@ FULL_t = [('pct', float), ('wgt', float),
           ('inol', float), ('vol', float),
           ('inol/set', float), ('vol/set', float)]
 
-WRM = np.array([(.3, 1, 8),
-                (.5, 1, 5),
-                (.7, 1, 3),
-                (.8, 1, 2),
-                (.9, 1, 1)],
+WRM = np.array([(.65, 1, 8),
+                (.75, 1, 5),
+                (.85, 1, 3),
+                (.95, 1, 3),
+                (.97, 1, 2)],
                dtype=PSR_t)
 
 def _get_rows(tbl, wn):
     wn = (wn-1)%len(tbl)
     main = tbl[[wn]][['pct','sets','reps']]
-    wrm = WRM[WRM['pct']<main['pct']]
+    l = WRM['pct']<main['pct']
+    l[l.argmin()]=True
+    wrm = WRM[l]
     return np.concatenate([wrm, main])
 
 class Lift:
@@ -40,9 +42,9 @@ class Lift:
                      (2, .93, 4, 2), 
                      (3, .97, 3, 2)],
                     dtype=WPSR_t)
-    _ACC = np.array([(1, .4, 3, 15), 
-                     (2, .4, 3, 15), 
-                     (3, .4, 3, 15)],
+    _ACC = np.array([(1, .65, 3, 10), 
+                     (2, .65, 3, 10), 
+                     (3, .65, 3, 10)],
                     dtype=WPSR_t)
     
     
@@ -72,17 +74,15 @@ class Lift:
         set_inols = np.round(np.divide(inols, sets, where=sets!=0), 2)
         set_vols = np.round(np.divide(vols, sets, where=sets!=0))
         ret_tbl = np.array(list(zip(pcts, wgts, sets, reps, inols, vols, set_inols, set_vols)), dtype=FULL_t)
-        upi=np.unique(ret_tbl['pct'], return_index=True)[1]
-        uri=np.unique(ret_tbl['reps'], return_index=True)[1]
-        return ret_tbl#[ii]
+        return ret_tbl
 
-    def hyp(self, wn):
+    def hyp(self, wn=1):
         return self._comp_stats(_get_rows(self._HYP, wn))
-    def pow(self, wn):
+    def pow(self, wn=1):
         return self._comp_stats(_get_rows(self._POW, wn))
-    def str(self, wn):
+    def str(self, wn=1):
         return self._comp_stats(_get_rows(self._STR, wn))
-    def acc(self, wn):
+    def acc(self, wn=1):
         return self._comp_stats(_get_rows(self._ACC, wn))
     
     @property
@@ -119,7 +119,8 @@ SDL = Lift('SUMO DL', 147.5, 20, 60)
 CDL = Lift('CONV DL', 104, 20, 60)
 CHT = Lift('CABLE HIP THRUST', 87.5, 0, 20)
     
-FBP = Lift('FLAT BP', 120, 12.5, 32.5)
+
+FBP = Lift('FLAT BP', 120, 12.5, 60)
 IBP = Lift('INCLINE BP', 92.5, 12.5, 32.5)
 CPF = Lift('CABLE PEC FLY', 18.75, 0,  6.5)
 RBP = Lift('REVERSE BP', 52.5, 12.5, 32.5)
