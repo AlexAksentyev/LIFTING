@@ -111,7 +111,7 @@ class Lift:
 
 
 # ******************************
-BSQ = Lift('BACK SQ', 145, 20, 60)
+BSQ = Lift('BACK SQ', 147.5, 20, 60)
 FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
 MLP = Lift('LEG PRESS', 300, 0, 40)
 
