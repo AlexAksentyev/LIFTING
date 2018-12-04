@@ -13,19 +13,21 @@ FULL_t = [('pct', float), ('wgt', float),
           ('inol', float), ('vol', float),
           ('inol/set', float), ('vol/set', float)]
 
-WRM = np.array([(.65, 1, 8),
-                (.75, 1, 5),
+WRM = np.array([(.35, 1, 8),
+                (.55, 1, 5),
+                (.75, 1, 3),
                 (.85, 1, 3),
-                (.95, 1, 3),
-                (.97, 1, 2)],
+                (.95, 1, 2)],
                dtype=PSR_t)
 
 def _get_rows(tbl, wn):
     wn = (wn-1)%len(tbl)
     main = tbl[[wn]][['pct','sets','reps']]
     l = WRM['pct']<main['pct']
-    l[l.argmin()]=True
-    wrm = WRM[l]
+    row = main.copy()
+    row['pct'] = row['pct']+.05 if row['pct']<.95 else .99
+    row['sets'] = 1; row['reps'] = int(.67*row['reps'])
+    wrm = np.hstack((WRM[l], row))
     return np.concatenate([wrm, main])
 
 class Lift:
