@@ -117,7 +117,7 @@ BSQ = Lift('BACK SQ', 147.5, 20, 60)
 FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
 MLP = Lift('LEG PRESS', 300, 0, 40)
 
-SDL = Lift('SUMO DL', 147.5, 20, 60)
+SDL = Lift('SUMO DL', 155, 20, 60)
 CDL = Lift('CONV DL', 104, 20, 60)
 CHT = Lift('CABLE HIP THRUST', 87.5, 0, 20)
     
