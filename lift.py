@@ -20,15 +20,23 @@ WRM = np.array([(.35, 1, 8),
                 (.95, 1, 2)],
                dtype=PSR_t)
 
+def str_wave(lift, tot_inol, num_waves=3):
+    wave_inol = tot_inol/num_waves
+    set_inol = wave_inol/3
+    pct_5 = lift.weight(5, set_inol)/lift.RM1
+    pct_3 = lift.weight(3, set_inol)/lift.RM1
+    pct_1 = lift.weight(1, set_inol)/lift.RM1
+    return lift._comp_stats(np.array(list(zip([pct_5, pct_3, pct_1], [3,3,3], [5,3,1])), dtype=PSR_t))
+
 def _get_rows(tbl, wn):
     wn = (wn-1)%len(tbl)
     main = tbl[[wn]][['pct','sets','reps']]
     l = WRM['pct']<main['pct']
-    row = main.copy()
-    row['pct'] = row['pct']+.05 if row['pct']<.95 else .99
-    row['sets'] = 1; row['reps'] = int(.67*row['reps'])
-    wrm = np.hstack((WRM[l], row))
-    return np.concatenate([wrm, main])
+    # row = main.copy()
+    # row['pct'] = row['pct']+.05 if row['pct']<.95 else .99
+    # row['sets'] = 1; row['reps'] = int(.67*row['reps'])
+    # wrm = np.hstack((WRM[l], row))
+    return np.concatenate([WRM[l], main])
 
 class Lift:
     _bar_wgt = 20
@@ -113,20 +121,23 @@ class Lift:
 
 
 # ******************************
-BSQ = Lift('BACK SQ', 147.5, 20, 60)
-FSQ = Lift('FRONT SQ', 90, 12.5, 52.5)
+BSQ = Lift('BACK SQ', 120, 20, 50) # current
+FSQ = Lift('FRONT SQ', 80, 20, 50) #
 MLP = Lift('LEG PRESS', 300, 0, 40)
 
-SDL = Lift('SUMO DL', 147.5, 20, 60)
-CDL = Lift('CONV DL', 104, 20, 60)
+SDL = Lift('SUMO DL', 130, 20, 50) #
+CDL = Lift('CONV DL', 80, 20, 50) #
 CHT = Lift('CABLE HIP THRUST', 87.5, 0, 20)
+TBR = Lift('T-BAR ROW', 50, 0, 20)
     
 
-FBP = Lift('FLAT BP', 120, 12.5, 60)
-IBP = Lift('INCLINE BP', 92.5, 12.5, 32.5)
+FBP = Lift('FLAT BP', 100, 20, 50) #
+PFBP = Lift('PAUSED FBP', 80, 20, 50) #
+CGBP = Lift('CLOSE GRIP BP', 100, 20, 50) #
+IBP = Lift('INCLINE BP', 102.5, 12.5, 32.5)
 CPF = Lift('CABLE PEC FLY', 18.75, 0,  6.5)
 RBP = Lift('REVERSE BP', 52.5, 12.5, 32.5)
-DIP = Lift('DIPS', 100, 0, 73)
+DIP = Lift('DIPS', 100, 0, 72)
     
-OHP = Lift('OHP', 70, 12.5, 32.5)
+OHP = Lift('OHP', 50, 20, 30) #
 

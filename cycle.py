@@ -69,4 +69,4 @@ if __name__ == '__main__':
     BSQMICRO = Micro('BSQ Strength', lift.BSQ, lift.SDL, lift.FBP)
     OHPMICRO = Micro('OHP Strength', lift.OHP, lift.FBP, lift.CDL)
     SDLMICRO = Micro('SDL Strength', lift.SDL, lift.BSQ, lift.FSQ)
-    FBPMICRO = Micro('FBP Strength', lift.FBP, lift.OHP, lift.DIP)
+    FBPMICRO = Micro('FBP Strength', lift.FBP, lift.OHP, lift.CGBP)
